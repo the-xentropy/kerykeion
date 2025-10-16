@@ -120,6 +120,8 @@ class AstrologicalSubject:
     houses_system_name: str
     perspective_type: PerspectiveType
     is_dst: Union[None, bool]
+    _ascmc: list[float]
+    _is_day_chart: bool
 
     # Generated internally
     city_data: dict[str, str]
@@ -145,6 +147,9 @@ class AstrologicalSubject:
     mean_lilith: Union[KerykeionPointModel, None]
     true_south_node: KerykeionPointModel
     mean_south_node: KerykeionPointModel
+    vertex: KerykeionPointModel
+    anti_vertex: KerykeionPointModel
+    fortune: KerykeionPointModel
 
     # Axes
     asc: KerykeionPointModel
@@ -439,6 +444,26 @@ class AstrologicalSubject:
         self.lat = float(self.city_data["lat"])
         self.tz_str = self.city_data["timezonestr"]
 
+    def _calculate_house_cusps_and_misc_points(self) -> tuple[list[float], list[float]]:
+        """Calculates the houses cusps and misc points"""
+        if self.zodiac_type == "Sidereal":
+            return swe.houses_ex(
+                tjdut=self.julian_day,
+                lat=self.lat, lon=self.lng,
+                hsys=str.encode(self.houses_system_identifier),
+                flags=swe.FLG_SIDEREAL
+            )
+
+        elif self.zodiac_type == "Tropic":
+            return swe.houses(
+                tjdut=self.julian_day, lat=self.lat,
+                lon=self.lng,
+                hsys=str.encode(self.houses_system_identifier)
+            )
+        else:
+            raise KerykeionException("Not a valid zodiac type: " + self.zodiac_type)
+        
+
     def _initialize_houses(self) -> None:
         """
         Calculate positions and store them in dictionaries
@@ -473,29 +498,7 @@ class AstrologicalSubject:
             Y  APC houses
         """
 
-        _ascmc = (-1.0, -1.0)
-
-        if self.zodiac_type == "Sidereal":
-            cusps, ascmc = swe.houses_ex(
-                tjdut=self.julian_day,
-                lat=self.lat, lon=self.lng,
-                hsys=str.encode(self.houses_system_identifier),
-                flags=swe.FLG_SIDEREAL
-            )
-            self._houses_degree_ut = cusps
-            _ascmc = ascmc
-
-        elif self.zodiac_type == "Tropic":
-            cusps, ascmc = swe.houses(
-                tjdut=self.julian_day, lat=self.lat,
-                lon=self.lng,
-                hsys=str.encode(self.houses_system_identifier)
-            )
-            self._houses_degree_ut = cusps
-            _ascmc = ascmc
-
-        else:
-            raise KerykeionException("Not a valid zodiac type: " + self.zodiac_type)
+        self._houses_degree_ut, self._ascmc = self._calculate_house_cusps_and_misc_points()
 
         point_type: PointType = "House"
 
@@ -535,18 +538,24 @@ class AstrologicalSubject:
         point_type: PointType = "AxialCusps"
 
         # Calculate ascendant and medium coeli
-        self.ascendant = get_kerykeion_point_from_degree(_ascmc[0], "Ascendant", point_type=point_type)
-        self.medium_coeli = get_kerykeion_point_from_degree(_ascmc[1], "Medium_Coeli", point_type=point_type)
+        self.ascendant = get_kerykeion_point_from_degree(self._ascmc[0], "Ascendant", point_type=point_type)
+        self.medium_coeli = get_kerykeion_point_from_degree(self._ascmc[1], "Medium_Coeli", point_type=point_type)
         # For descendant and imum coeli there exist no Swiss Ephemeris library calculation function,
         # but they are simply opposite the the ascendant and medium coeli
-        dsc_deg = math.fmod(_ascmc[0] + 180, 360)
-        ic_deg = math.fmod(_ascmc[1] + 180, 360)
+        dsc_deg = math.fmod(self._ascmc[0] + 180, 360)
+        ic_deg = math.fmod(self._ascmc[1] + 180, 360)
         self.descendant = get_kerykeion_point_from_degree(dsc_deg, "Descendant", point_type=point_type)
         self.imum_coeli = get_kerykeion_point_from_degree(ic_deg, "Imum_Coeli", point_type=point_type)
 
     def _initialize_planets(self) -> None:
         """Defines body positon in signs and information and
         stores them in dictionaries"""
+
+        if not self._ascmc or not self._houses_degree_ut:
+            # This should never happen unless we happen to call this method before calculating houses.
+            # But because they're separate functions and we can't completely guarantee this, let's check so we can
+            # instantly tell in testing if we did something wrong.
+            raise KeyError("INTERNAL FATAL ERROR: Houses must be calculated before planets! ASCMC or house cusps missing.")
 
         point_type: PointType = "Planet"
 
@@ -567,6 +576,18 @@ class AstrologicalSubject:
         mean_south_node_deg = math.fmod(mean_node_deg + 180, 360)
         true_south_node_deg = math.fmod(true_node_deg + 180, 360)
 
+        vertex_deg = self._ascmc[swe.SE_VERTEX]
+        anti_vertex_deg = math.fmod(vertex_deg + 180, 360)
+
+        # fortune requires determining if we're a day chart or night chart.
+        # this is an *or* check rather than an *and* check beacuse abs_pos is modulo 360
+        # thus sun  between the asc and desc (on the northern side) even if sun < asc and sun < desc
+        self._is_day_chart = sun_deg > self.ascendant.abs_pos or sun_deg < self.descendant.abs_pos
+        if self._is_day_chart:
+            fortune_deg = self.ascendant.abs_pos + (moon_deg - sun_deg)
+        else:
+            fortune_deg = self.ascendant.abs_pos - (moon_deg - sun_deg)
+
         # AC/DC axis and MC/IC axis were already calculated previously...
 
         self.sun = get_kerykeion_point_from_degree(sun_deg, "Sun", point_type=point_type)
@@ -583,6 +604,9 @@ class AstrologicalSubject:
         self.true_node = get_kerykeion_point_from_degree(true_node_deg, "True_Node", point_type=point_type)
         self.mean_south_node = get_kerykeion_point_from_degree(mean_south_node_deg, "Mean_South_Node", point_type=point_type)
         self.true_south_node = get_kerykeion_point_from_degree(true_south_node_deg, "True_South_Node", point_type=point_type)
+        self.vertex = get_kerykeion_point_from_degree(vertex_deg, "Vertex", point_type=point_type)
+        self.anti_vertex = get_kerykeion_point_from_degree(anti_vertex_deg, "Anti_Vertex", point_type=point_type)
+        self.fortune = get_kerykeion_point_from_degree(fortune_deg, "Fortune", point_type=point_type)
 
         # Note that in whole-sign house systems ac/dc or mc/ic axes may not align with house cusps.
         # Therefore, for the axes we need to calculate house positions explicitly too.
@@ -605,6 +629,9 @@ class AstrologicalSubject:
         self.true_node.house = get_planet_house(true_node_deg, self._houses_degree_ut)
         self.mean_south_node.house = get_planet_house(mean_south_node_deg, self._houses_degree_ut)
         self.true_south_node.house = get_planet_house(true_south_node_deg, self._houses_degree_ut)
+        self.vertex.house = get_planet_house(vertex_deg, self._houses_degree_ut)
+        self.anti_vertex.house = get_planet_house(anti_vertex_deg, self._houses_degree_ut)
+        self.fortune.house = get_planet_house(fortune_deg, self._houses_degree_ut)
 
 
         # Deprecated
@@ -623,6 +650,9 @@ class AstrologicalSubject:
             self.true_node,
             self.mean_south_node,
             self.true_south_node,
+            self.vertex,
+            self.anti_vertex,
+            self.fortune,
         ]
 
         if not self.disable_chiron_and_lilith:
@@ -671,6 +701,10 @@ class AstrologicalSubject:
         self.descendant.retrograde = False
         self.medium_coeli.retrograde = False
         self.imum_coeli.retrograde = False
+        # Similarly, neither Vertex/Anti-vertex of Fortune are retrograde since their positions are derived from other points which can also never retrograde.
+        self.vertex.retrograde = False
+        self.anti_vertex.retrograde = False
+        self.fortune.retrograde = False
 
 
     def json(self, dump=False, destination_folder: Union[str, None] = None, indent: Union[int, None] = None) -> str:
