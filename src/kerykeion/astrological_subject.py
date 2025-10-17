@@ -538,12 +538,12 @@ class AstrologicalSubject:
         point_type: PointType = "AxialCusps"
 
         # Calculate ascendant and medium coeli
-        self.ascendant = get_kerykeion_point_from_degree(self._ascmc[0], "Ascendant", point_type=point_type)
-        self.medium_coeli = get_kerykeion_point_from_degree(self._ascmc[1], "Medium_Coeli", point_type=point_type)
+        self.ascendant = get_kerykeion_point_from_degree(self._ascmc[swe.ASC], "Ascendant", point_type=point_type)
+        self.medium_coeli = get_kerykeion_point_from_degree(self._ascmc[swe.MC], "Medium_Coeli", point_type=point_type)
         # For descendant and imum coeli there exist no Swiss Ephemeris library calculation function,
         # but they are simply opposite the the ascendant and medium coeli
-        dsc_deg = math.fmod(self._ascmc[0] + 180, 360)
-        ic_deg = math.fmod(self._ascmc[1] + 180, 360)
+        dsc_deg = math.fmod(self._ascmc[swe.ASC] + 180, 360)
+        ic_deg = math.fmod(self._ascmc[swe.MC] + 180, 360)
         self.descendant = get_kerykeion_point_from_degree(dsc_deg, "Descendant", point_type=point_type)
         self.imum_coeli = get_kerykeion_point_from_degree(ic_deg, "Imum_Coeli", point_type=point_type)
 
@@ -559,24 +559,24 @@ class AstrologicalSubject:
 
         point_type: PointType = "Planet"
 
-        sun_deg = swe.calc_ut(self.julian_day, 0, self._iflag)[0][0]
-        moon_deg = swe.calc_ut(self.julian_day, 1, self._iflag)[0][0]
-        mercury_deg = swe.calc_ut(self.julian_day, 2, self._iflag)[0][0]
-        venus_deg = swe.calc_ut(self.julian_day, 3, self._iflag)[0][0]
-        mars_deg = swe.calc_ut(self.julian_day, 4, self._iflag)[0][0]
-        jupiter_deg = swe.calc_ut(self.julian_day, 5, self._iflag)[0][0]
-        saturn_deg = swe.calc_ut(self.julian_day, 6, self._iflag)[0][0]
-        uranus_deg = swe.calc_ut(self.julian_day, 7, self._iflag)[0][0]
-        neptune_deg = swe.calc_ut(self.julian_day, 8, self._iflag)[0][0]
-        pluto_deg = swe.calc_ut(self.julian_day, 9, self._iflag)[0][0]
-        mean_node_deg = swe.calc_ut(self.julian_day, 10, self._iflag)[0][0]
-        true_node_deg = swe.calc_ut(self.julian_day, 11, self._iflag)[0][0]
+        sun_deg = swe.calc_ut(self.julian_day, swe.SUN, self._iflag)[0][0]
+        moon_deg = swe.calc_ut(self.julian_day, swe.MOON, self._iflag)[0][0]
+        mercury_deg = swe.calc_ut(self.julian_day, swe.MERCURY, self._iflag)[0][0]
+        venus_deg = swe.calc_ut(self.julian_day, swe.VENUS, self._iflag)[0][0]
+        mars_deg = swe.calc_ut(self.julian_day, swe.MARS, self._iflag)[0][0]
+        jupiter_deg = swe.calc_ut(self.julian_day, swe.JUPITER, self._iflag)[0][0]
+        saturn_deg = swe.calc_ut(self.julian_day, swe.SATURN, self._iflag)[0][0]
+        uranus_deg = swe.calc_ut(self.julian_day, swe.URANUS, self._iflag)[0][0]
+        neptune_deg = swe.calc_ut(self.julian_day, swe.NEPTUNE, self._iflag)[0][0]
+        pluto_deg = swe.calc_ut(self.julian_day, swe.PLUTO, self._iflag)[0][0]
+        mean_node_deg = swe.calc_ut(self.julian_day, swe.MEAN_NODE, self._iflag)[0][0]
+        true_node_deg = swe.calc_ut(self.julian_day, swe.TRUE_NODE, self._iflag)[0][0]
         # For south nodes there exist no Swiss Ephemeris library calculation function,
         # but they are simply opposite the north node.
         mean_south_node_deg = math.fmod(mean_node_deg + 180, 360)
         true_south_node_deg = math.fmod(true_node_deg + 180, 360)
 
-        vertex_deg = self._ascmc[swe.SE_VERTEX]
+        vertex_deg = self._ascmc[swe.VERTEX]    
         anti_vertex_deg = math.fmod(vertex_deg + 180, 360)
 
         # fortune requires determining if we're a day chart or night chart.
