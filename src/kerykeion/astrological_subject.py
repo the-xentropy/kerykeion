@@ -731,6 +731,14 @@ class AstrologicalSubject:
 
         return json_string
 
+
+    def get_planet_house(self, planet: AstrologicalSubjectModel) -> Houses:
+        """
+        Returns the house in which a given planet is located.
+        Useful for e.g. seeing which natal house a transiting planet is in.
+        """
+        return get_planet_house(planet.abs_pos, self._houses_degree_ut)
+
     def model(self) -> AstrologicalSubjectModel:
         """
         Creates a Pydantic model of the Kerykeion object.
