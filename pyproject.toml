@@ -111,3 +111,8 @@ dependencies = [
     "pytz>=2024.2",
     "typing-extensions>=4.12.2",
     ]
+
+[tool.setuptools.package-data]
+# since we embed the seas_18.se1 file
+# we need to ensure it's included
+"*" = ["*.se1"]
