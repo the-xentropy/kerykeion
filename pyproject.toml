@@ -115,4 +115,4 @@ dependencies = [
 [tool.setuptools.package-data]
 # since we embed the seas_18.se1 file
 # we need to ensure it's included
-"*" = ["*.se1"]
+"*" = ["*.se1",".json"]
