@@ -102,7 +102,7 @@ description = "A python library for astrology."
 readme = "README.md"
 requires-python = ">=3.19"
 dependencies = [
-    "pyswisseph = >=2.10.3.1"
+    "pyswisseph>=2.10.3.1",
     "pydantic>=2.5",
     "scour>=0.38.2",
     "requests-cache>=1.2.1",
@@ -110,7 +110,7 @@ dependencies = [
     "simple-ascii-tables>=1.0.0",
     "pytz>=2024.2",
     "typing-extensions>=4.12.2",
-]
+    ]
 
 [tool.setuptools]
 packages = ["kerykeion"]
