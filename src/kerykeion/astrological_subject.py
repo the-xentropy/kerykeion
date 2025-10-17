@@ -685,10 +685,13 @@ class AstrologicalSubject:
 
             # Swiss ephemeris library does not offer calculation of direction of south nodes.
             # But south nodes have same direction as north nodes. We can use those to calculate direction.
-            if planet_number == 1000:   # Number of Mean South Node
-                planet_number = 10      # Number of Mean North Node
-            elif planet_number == 1100: # Number of True South Node
-                planet_number = 11      # Number of True North Node
+            if planet_number == 1000:   # (Fake) Number of Mean South Node
+                planet_number = swe.MEAN_NODE      # Number of Mean North Node
+            elif planet_number == 1100: # (Fake) Number of True South Node
+                planet_number = swe.TRUE_NODE      # Number of True North Node
+            elif planet_number in [swe.VERTEX, swe.VERTEX+1, swe.VERTEX+2]: # Vertex, anti-vertex, fortune
+                # All of these points are ostensibly sun-derived points and thus have no retrograde motion.
+                planet_number = swe.SUN
 
 
             if swe.calc_ut(self.julian_day, planet_number, self._iflag)[0][3] < 0:
