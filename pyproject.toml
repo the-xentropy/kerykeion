@@ -100,7 +100,7 @@ name = "kerykeion"
 version = "4.26.3"
 description = "A python library for astrology."
 readme = "README.md"
-requires-python = ">=3.19"
+requires-python = ">=3.9"
 dependencies = [
     "pyswisseph>=2.10.3.1",
     "pydantic>=2.5",
