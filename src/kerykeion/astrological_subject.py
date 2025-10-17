@@ -689,7 +689,7 @@ class AstrologicalSubject:
                 planet_number = swe.MEAN_NODE      # Number of Mean North Node
             elif planet_number == 1100: # (Fake) Number of True South Node
                 planet_number = swe.TRUE_NODE      # Number of True North Node
-            elif planet_number in [swe.VERTEX, swe.VERTEX+1, swe.VERTEX+2]: # Vertex, anti-vertex, fortune
+            elif planet_number in [9910+swe.VERTEX, 9910+swe.VERTEX+1, 9910+swe.VERTEX+2]: # (Fake) numbers for Vertex, anti-vertex, fortune
                 # All of these points are ostensibly sun-derived points and thus have no retrograde motion.
                 planet_number = swe.SUN
 
