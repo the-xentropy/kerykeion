@@ -59,6 +59,21 @@ def get_number_from_name(name: Planet) -> int:
         raise KerykeionException(f"Error in getting number from name! Name: {name}")
 
 
+ZODIAC_SIGNS = {
+        0: ZodiacSignModel(sign="Ari", full_name="Aries", quality="Cardinal", element="Fire", emoji="♈️", sign_num=0),
+        1: ZodiacSignModel(sign="Tau", full_name="Taurus", quality="Fixed", element="Earth", emoji="♉️", sign_num=1),
+        2: ZodiacSignModel(sign="Gem", full_name="Gemini", quality="Mutable", element="Air", emoji="♊️", sign_num=2),
+        3: ZodiacSignModel(sign="Can", full_name="Cancer", quality="Cardinal", element="Water", emoji="♋️", sign_num=3),
+        4: ZodiacSignModel(sign="Leo", full_name="Leo", quality="Fixed", element="Fire", emoji="♌️", sign_num=4),
+        5: ZodiacSignModel(sign="Vir", full_name="Virgo", quality="Mutable", element="Earth", emoji="♍️", sign_num=5),
+        6: ZodiacSignModel(sign="Lib", full_name="Libra", quality="Cardinal", element="Air", emoji="♎️", sign_num=6),
+        7: ZodiacSignModel(sign="Sco", full_name="Scorpio", quality="Fixed", element="Water", emoji="♏️", sign_num=7),
+        8: ZodiacSignModel(sign="Sag", full_name="Sagittarius", quality="Mutable", element="Fire", emoji="♐️", sign_num=8),
+        9: ZodiacSignModel(sign="Cap", full_name="Capricorn", quality="Cardinal", element="Earth", emoji="♑️", sign_num=9),
+        10: ZodiacSignModel(sign="Aqu", full_name="Aquarius", quality="Fixed", element="Air", emoji="♒️", sign_num=10),
+        11: ZodiacSignModel(sign="Pis", full_name="Pisces", quality="Mutable", element="Water", emoji="♓️", sign_num=11),
+    }
+
 def get_kerykeion_point_from_degree(
     degree: Union[int, float], name: Union[Planet, Houses, AxialCusps], point_type: PointType
 ) -> KerykeionPointModel:
@@ -79,21 +94,6 @@ def get_kerykeion_point_from_degree(
 
     if degree < 0 or degree >= 360:
         raise KerykeionException(f"Error in calculating positions! Degrees: {degree}")
-
-    ZODIAC_SIGNS = {
-        0: ZodiacSignModel(sign="Ari", quality="Cardinal", element="Fire", emoji="♈️", sign_num=0),
-        1: ZodiacSignModel(sign="Tau", quality="Fixed", element="Earth", emoji="♉️", sign_num=1),
-        2: ZodiacSignModel(sign="Gem", quality="Mutable", element="Air", emoji="♊️", sign_num=2),
-        3: ZodiacSignModel(sign="Can", quality="Cardinal", element="Water", emoji="♋️", sign_num=3),
-        4: ZodiacSignModel(sign="Leo", quality="Fixed", element="Fire", emoji="♌️", sign_num=4),
-        5: ZodiacSignModel(sign="Vir", quality="Mutable", element="Earth", emoji="♍️", sign_num=5),
-        6: ZodiacSignModel(sign="Lib", quality="Cardinal", element="Air", emoji="♎️", sign_num=6),
-        7: ZodiacSignModel(sign="Sco", quality="Fixed", element="Water", emoji="♏️", sign_num=7),
-        8: ZodiacSignModel(sign="Sag", quality="Mutable", element="Fire", emoji="♐️", sign_num=8),
-        9: ZodiacSignModel(sign="Cap", quality="Cardinal", element="Earth", emoji="♑️", sign_num=9),
-        10: ZodiacSignModel(sign="Aqu", quality="Fixed", element="Air", emoji="♒️", sign_num=10),
-        11: ZodiacSignModel(sign="Pis", quality="Mutable", element="Water", emoji="♓️", sign_num=11),
-    }
 
     sign_index = int(degree // 30)
     sign_degree = degree % 30
