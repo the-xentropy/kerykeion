@@ -4,6 +4,7 @@ from typing import Union, get_args, TYPE_CHECKING
 import logging
 import math
 import re
+import swisseph as swe
 
 if TYPE_CHECKING:
     from kerykeion import AstrologicalSubject
@@ -13,38 +14,39 @@ def get_number_from_name(name: Planet) -> int:
     """Utility function, gets planet id from the name."""
 
     if name == "Sun":
-        return 0
+        return swe.SUN # 0
     elif name == "Moon":
-        return 1
+        return swe.MOON # 1
     elif name == "Mercury":
-        return 2
+        return swe.MERCURY # 2
     elif name == "Venus":
-        return 3
+        return swe.VENUS # 3
     elif name == "Mars":
-        return 4
+        return swe.MARS # 4
     elif name == "Jupiter":
-        return 5
+        return swe.JUPITER # 5
     elif name == "Saturn":
-        return 6
+        return swe.SATURN # 6
     elif name == "Uranus":
-        return 7
+        return swe.URANUS # 7
     elif name == "Neptune":
-        return 8
+        return swe.NEPTUNE # 8
     elif name == "Pluto":
-        return 9
+        return swe.PLUTO # 9
     elif name == "Mean_Node":
-        return 10
+        return swe.MEAN_NODE # 10
     elif name == "True_Node":
-        return 11
+        return swe.TRUE_NODE # 11
     # Note: Swiss ephemeris library has no constants for south nodes. We're using integers >= 1000 for them.
     elif name == "Mean_South_Node":
         return 1000
     elif name == "True_South_Node":
         return 1100
     elif name == "Chiron":
-        return 15
+        return swe.CHIRON # 15
     elif name == "Mean_Lilith":
-        return 12
+        # Mean Lilith is represented as the mean apogee in Swiss Ephemeris
+        return swe.MEAN_APOG # 12
     elif name == "Ascendant": # TODO: Is this needed?
         return 9900
     elif name == "Descendant": # TODO: Is this needed?
