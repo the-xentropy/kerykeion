@@ -111,6 +111,3 @@ dependencies = [
     "pytz>=2024.2",
     "typing-extensions>=4.12.2",
     ]
-
-[tool.setuptools]
-packages = ["kerykeion"]
