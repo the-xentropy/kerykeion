@@ -55,6 +55,16 @@ def get_number_from_name(name: Planet) -> int:
         return 9902
     elif name == "Imum_Coeli": # TODO: Is this needed?
         return 9903
+    
+    # These are not 'planets' in Swiss Ephemeris, but need numbers in the kerykeion implementation
+    # so we just make up some arbitrary ones
+    elif name == "Vertex":
+        return 9910+swe.VERTEX
+    elif name == "Anti_Vertex":
+        return 9910+swe.VERTEX+1
+    elif name == "Fortune":
+        return 9910+swe.VERTEX+2
+    
     else:
         raise KerykeionException(f"Error in getting number from name! Name: {name}")
 
