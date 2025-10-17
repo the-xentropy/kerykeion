@@ -507,3 +507,21 @@ def inline_css_variables_in_svg(svg_content: str) -> str:
         )
 
     return processed_svg
+
+
+def decimal_degrees_to_minutes_and_seconds(decimal_degrees: float) -> tuple[int, int, float]:
+    """
+    Convert decimal degrees to degrees, minutes, and seconds.
+
+    Args:
+        decimal_degrees (float): The angle in decimal degrees
+
+    Returns:
+        tuple[int, int, float]: A tuple containing degrees, minutes, and seconds
+    """
+    degrees = int(decimal_degrees)
+    minutes_full = abs((decimal_degrees - degrees) * 60)
+    minutes = int(minutes_full)
+    seconds = (minutes_full - minutes) * 60
+
+    return degrees, minutes, seconds
