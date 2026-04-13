@@ -582,12 +582,12 @@ class AstrologicalSubject:
         # fortune requires determining if we're a day chart or night chart.
         # this is an *or* check rather than an *and* check beacuse abs_pos is modulo 360
         # thus sun  between the asc and desc (on the northern side) even if sun < asc and sun < desc
-        self._is_day_chart = sun_deg > self.ascendant.abs_pos or sun_deg < self.descendant.abs_pos
+        self._is_day_chart = sun_deg >= self.ascendant.abs_pos or sun_deg < self.descendant.abs_pos
         if self._is_day_chart:
             fortune_deg = self.ascendant.abs_pos + (moon_deg - sun_deg)
         else:
-            fortune_deg = self.ascendant.abs_pos - (moon_deg - sun_deg)
-        fortune_deg = math.fmod(fortune_deg, 360)
+            fortune_deg = self.ascendant.abs_pos + (sun_deg - moon_deg)
+        fortune_deg = fortune_deg % 360 # fortune_deg can be negative here so we don't want to use fmod
 
         # AC/DC axis and MC/IC axis were already calculated previously...
 
