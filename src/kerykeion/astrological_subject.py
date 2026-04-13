@@ -587,6 +587,7 @@ class AstrologicalSubject:
             fortune_deg = self.ascendant.abs_pos + (moon_deg - sun_deg)
         else:
             fortune_deg = self.ascendant.abs_pos - (moon_deg - sun_deg)
+        fortune_deg = math.fmod(fortune_deg, 360)
 
         # AC/DC axis and MC/IC axis were already calculated previously...
 
